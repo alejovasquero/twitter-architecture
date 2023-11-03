@@ -3,11 +3,24 @@ package com.myorg;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
 import software.amazon.awscdk.services.apigateway.IResource;
+import software.amazon.awscdk.services.apigateway.LambdaIntegration;
 import software.amazon.awscdk.services.apigateway.Method;
 import software.amazon.awscdk.services.apigateway.RestApi;
+import software.amazon.awscdk.services.iam.IRole;
+import software.amazon.awscdk.services.iam.Role;
+import software.amazon.awscdk.services.lambda.Code;
+import software.amazon.awscdk.services.lambda.Function;
+import software.amazon.awscdk.services.lambda.Runtime;
+import software.amazon.awscdk.services.s3.Bucket;
+import software.amazon.awscdk.services.s3.IBucket;
 import software.constructs.Construct;
 
 public class TwitterArchitectureAPIStack extends Stack {
+
+    private Construct scope;
+    private static final String JAR = "target/twitter-architecture-0.1.jar";
+    private IRole existingRole = Role.fromRoleArn(this, "MyExistingRole", "arn:aws:iam::866956573632:role/LabRole");
+    private IBucket codeBucket = Bucket.fromBucketArn(this, "ExistingBucket", "arn:aws:s3:::codebuckettwitter");
 
     public TwitterArchitectureAPIStack(final Construct scope, final String id) {
         this(scope, id, null);
@@ -15,7 +28,7 @@ public class TwitterArchitectureAPIStack extends Stack {
 
     public TwitterArchitectureAPIStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
-
+        this.scope = scope;
         // The code that defines your stack goes here
 
         // example resource
@@ -41,9 +54,11 @@ public class TwitterArchitectureAPIStack extends Stack {
         IResource idResource = usersResource.addResource("{id}");
 
         IResource getTweets = idResource.addResource("tweets");
-        getTweets.addMethod("GET");
+        getTweets.addMethod("GET", new LambdaIntegration(
+                createNewLambda(this.scope, "GetTweetLambda", JAR, "com.myorg.handlers.ObtainTweetsHandler::handler")));
         IResource addFollower = idResource.addResource("followers");
-        addFollower.addMethod("POST");
+        addFollower.addMethod("POST",  new LambdaIntegration(
+                createNewLambda(this.scope, "AddFollower", JAR, "com.myorg.handlers.AddFollowerHandler::handler")));
     }
 
     private void createTweetsResource(IResource resource) {
@@ -56,6 +71,20 @@ public class TwitterArchitectureAPIStack extends Stack {
         comment.addMethod("POST");
         IResource likes = tweetId.addResource("likes");
         likes.addMethod("POST");
+    }
+
+    public Function createNewLambda(final Construct scope, final String name, final String asset,
+            final String handler) {
+        
+        Function lambda = Function.Builder.create(this, name)
+                .runtime(Runtime.JAVA_17)
+                .code(Code.fromBucket(codeBucket, "twitter-architecture.jar"))
+                .handler(handler)
+                .role(existingRole)
+                .functionName(name)
+                .build();
+
+        return lambda;
     }
 
 }
