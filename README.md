@@ -67,6 +67,12 @@ Once you are done, delete the resources
 aws cloudformation delete-stack --stack-name Twitter
 ```
 
+Delete the bucket
+
+```bash
+aws s3 rm s3://codebuckettwitter/ --recursive && aws s3api delete-bucket --bucket codebuckettwitter
+```
+
 ## Twitter entity
 
 This is a general data architecture of the solution.
