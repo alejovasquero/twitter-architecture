@@ -1,0 +1,531 @@
+Resources:
+  TwitterRestAPIBCBB8D1C:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: The twitter rest API :)
+      Name: TwitterRestAPI
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Resource
+  TwitterRestAPIDeploymentA5158894f0b7ba02be8e94f76a6f549d16efbc8f:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      Description: The twitter rest API :)
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    DependsOn:
+      - TwitterRestAPIapi980FC20C
+      - TwitterRestAPIapiv1698E4A1B
+      - TwitterRestAPIapiv1tweetsidcommentsPOSTF765165F
+      - TwitterRestAPIapiv1tweetsidcomments3066183E
+      - TwitterRestAPIapiv1tweetsidlikesPOSTF464A17E
+      - TwitterRestAPIapiv1tweetsidlikesC680B018
+      - TwitterRestAPIapiv1tweetsid7234ABF3
+      - TwitterRestAPIapiv1tweetsPOST45762352
+      - TwitterRestAPIapiv1tweets12665E76
+      - TwitterRestAPIapiv1usersidfollowersPOST20B1A7A7
+      - TwitterRestAPIapiv1usersidfollowers2E3783FB
+      - TwitterRestAPIapiv1usersid15717FFD
+      - TwitterRestAPIapiv1usersidtweetsGETB91CA910
+      - TwitterRestAPIapiv1usersidtweets2CB47ED9
+      - TwitterRestAPIapiv1users6F554E9A
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Deployment/Resource
+  TwitterRestAPIDeploymentStageprodAA3195DF:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId:
+        Ref: TwitterRestAPIDeploymentA5158894f0b7ba02be8e94f76a6f549d16efbc8f
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+      StageName: prod
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/DeploymentStage.prod/Resource
+  TwitterRestAPIapi980FC20C:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - TwitterRestAPIBCBB8D1C
+          - RootResourceId
+      PathPart: api
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/Resource
+  TwitterRestAPIapiv1698E4A1B:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: TwitterRestAPIapi980FC20C
+      PathPart: v1
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/Resource
+  TwitterRestAPIapiv1users6F554E9A:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: TwitterRestAPIapiv1698E4A1B
+      PathPart: users
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/Resource
+  TwitterRestAPIapiv1usersid15717FFD:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: TwitterRestAPIapiv1users6F554E9A
+      PathPart: "{id}"
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/{id}/Resource
+  TwitterRestAPIapiv1usersidtweets2CB47ED9:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: TwitterRestAPIapiv1usersid15717FFD
+      PathPart: tweets
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/{id}/tweets/Resource
+  TwitterRestAPIapiv1usersidtweetsGETApiPermissionTwitterArchitectureAPIStackTwitterRestAPI9B37EB8AGETapiv1usersidtweetsD0CE6ADF:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - GetTweetLambda8627C60B
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /
+            - Ref: TwitterRestAPIDeploymentStageprodAA3195DF
+            - /GET/api/v1/users/*/tweets
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/{id}/tweets/GET/ApiPermission.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.GET..api.v1.users.{id}.tweets
+  TwitterRestAPIapiv1usersidtweetsGETApiPermissionTestTwitterArchitectureAPIStackTwitterRestAPI9B37EB8AGETapiv1usersidtweetsFAE2C4FE:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - GetTweetLambda8627C60B
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /test-invoke-stage/GET/api/v1/users/*/tweets
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/{id}/tweets/GET/ApiPermission.Test.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.GET..api.v1.users.{id}.tweets
+  TwitterRestAPIapiv1usersidtweetsGETB91CA910:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - GetTweetLambda8627C60B
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: TwitterRestAPIapiv1usersidtweets2CB47ED9
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/{id}/tweets/GET/Resource
+  TwitterRestAPIapiv1usersidfollowers2E3783FB:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: TwitterRestAPIapiv1usersid15717FFD
+      PathPart: followers
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/{id}/followers/Resource
+  TwitterRestAPIapiv1usersidfollowersPOSTApiPermissionTwitterArchitectureAPIStackTwitterRestAPI9B37EB8APOSTapiv1usersidfollowersE5393FA0:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - AddFollower9FD60151
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /
+            - Ref: TwitterRestAPIDeploymentStageprodAA3195DF
+            - /POST/api/v1/users/*/followers
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/{id}/followers/POST/ApiPermission.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.POST..api.v1.users.{id}.followers
+  TwitterRestAPIapiv1usersidfollowersPOSTApiPermissionTestTwitterArchitectureAPIStackTwitterRestAPI9B37EB8APOSTapiv1usersidfollowers2A779DF3:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - AddFollower9FD60151
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /test-invoke-stage/POST/api/v1/users/*/followers
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/{id}/followers/POST/ApiPermission.Test.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.POST..api.v1.users.{id}.followers
+  TwitterRestAPIapiv1usersidfollowersPOST20B1A7A7:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - AddFollower9FD60151
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: TwitterRestAPIapiv1usersidfollowers2E3783FB
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/users/{id}/followers/POST/Resource
+  TwitterRestAPIapiv1tweets12665E76:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: TwitterRestAPIapiv1698E4A1B
+      PathPart: tweets
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/Resource
+  TwitterRestAPIapiv1tweetsPOSTApiPermissionTwitterArchitectureAPIStackTwitterRestAPI9B37EB8APOSTapiv1tweetsBBC834E1:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - CreateWeetCDE96D64
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /
+            - Ref: TwitterRestAPIDeploymentStageprodAA3195DF
+            - /POST/api/v1/tweets
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/POST/ApiPermission.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.POST..api.v1.tweets
+  TwitterRestAPIapiv1tweetsPOSTApiPermissionTestTwitterArchitectureAPIStackTwitterRestAPI9B37EB8APOSTapiv1tweets77ACDE04:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - CreateWeetCDE96D64
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /test-invoke-stage/POST/api/v1/tweets
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/POST/ApiPermission.Test.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.POST..api.v1.tweets
+  TwitterRestAPIapiv1tweetsPOST45762352:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - CreateWeetCDE96D64
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: TwitterRestAPIapiv1tweets12665E76
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/POST/Resource
+  TwitterRestAPIapiv1tweetsid7234ABF3:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: TwitterRestAPIapiv1tweets12665E76
+      PathPart: "{id}"
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/{id}/Resource
+  TwitterRestAPIapiv1tweetsidcomments3066183E:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: TwitterRestAPIapiv1tweetsid7234ABF3
+      PathPart: comments
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/{id}/comments/Resource
+  TwitterRestAPIapiv1tweetsidcommentsPOSTApiPermissionTwitterArchitectureAPIStackTwitterRestAPI9B37EB8APOSTapiv1tweetsidcomments93ED877C:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - AddComment1B82176E
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /
+            - Ref: TwitterRestAPIDeploymentStageprodAA3195DF
+            - /POST/api/v1/tweets/*/comments
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/{id}/comments/POST/ApiPermission.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.POST..api.v1.tweets.{id}.comments
+  TwitterRestAPIapiv1tweetsidcommentsPOSTApiPermissionTestTwitterArchitectureAPIStackTwitterRestAPI9B37EB8APOSTapiv1tweetsidcomments595EE4E9:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - AddComment1B82176E
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /test-invoke-stage/POST/api/v1/tweets/*/comments
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/{id}/comments/POST/ApiPermission.Test.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.POST..api.v1.tweets.{id}.comments
+  TwitterRestAPIapiv1tweetsidcommentsPOSTF765165F:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - AddComment1B82176E
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: TwitterRestAPIapiv1tweetsidcomments3066183E
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/{id}/comments/POST/Resource
+  TwitterRestAPIapiv1tweetsidlikesC680B018:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: TwitterRestAPIapiv1tweetsid7234ABF3
+      PathPart: likes
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/{id}/likes/Resource
+  TwitterRestAPIapiv1tweetsidlikesPOSTApiPermissionTwitterArchitectureAPIStackTwitterRestAPI9B37EB8APOSTapiv1tweetsidlikes119473E3:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - LikeTweet2842E7E1
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /
+            - Ref: TwitterRestAPIDeploymentStageprodAA3195DF
+            - /POST/api/v1/tweets/*/likes
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/{id}/likes/POST/ApiPermission.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.POST..api.v1.tweets.{id}.likes
+  TwitterRestAPIapiv1tweetsidlikesPOSTApiPermissionTestTwitterArchitectureAPIStackTwitterRestAPI9B37EB8APOSTapiv1tweetsidlikes57A3EBC4:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - LikeTweet2842E7E1
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:aws:execute-api:us-east-1:866956573632:"
+            - Ref: TwitterRestAPIBCBB8D1C
+            - /test-invoke-stage/POST/api/v1/tweets/*/likes
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/{id}/likes/POST/ApiPermission.Test.TwitterArchitectureAPIStackTwitterRestAPI9B37EB8A.POST..api.v1.tweets.{id}.likes
+  TwitterRestAPIapiv1tweetsidlikesPOSTF464A17E:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - LikeTweet2842E7E1
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: TwitterRestAPIapiv1tweetsidlikesC680B018
+      RestApiId:
+        Ref: TwitterRestAPIBCBB8D1C
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/TwitterRestAPI/Default/api/v1/tweets/{id}/likes/POST/Resource
+  GetTweetLambda8627C60B:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: codebuckettwitter
+        S3Key: twitter-architecture.jar
+      FunctionName: GetTweetLambda
+      Handler: com.myorg.handlers.ObtainTweetsHandler::handler
+      Role: arn:aws:iam::866956573632:role/LabRole
+      Runtime: java17
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/GetTweetLambda/Resource
+  AddFollower9FD60151:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: codebuckettwitter
+        S3Key: twitter-architecture.jar
+      FunctionName: AddFollower
+      Handler: com.myorg.handlers.AddFollowerHandler::handler
+      Role: arn:aws:iam::866956573632:role/LabRole
+      Runtime: java17
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/AddFollower/Resource
+  CreateWeetCDE96D64:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: codebuckettwitter
+        S3Key: twitter-architecture.jar
+      FunctionName: CreateWeet
+      Handler: com.myorg.handlers.CreateTweet::handler
+      Role: arn:aws:iam::866956573632:role/LabRole
+      Runtime: java17
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/CreateWeet/Resource
+  AddComment1B82176E:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: codebuckettwitter
+        S3Key: twitter-architecture.jar
+      FunctionName: AddComment
+      Handler: com.myorg.handlers.AddTweetComment::handler
+      Role: arn:aws:iam::866956573632:role/LabRole
+      Runtime: java17
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/AddComment/Resource
+  LikeTweet2842E7E1:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: codebuckettwitter
+        S3Key: twitter-architecture.jar
+      FunctionName: LikeTweet
+      Handler: com.myorg.handlers.AddLike::handler
+      Role: arn:aws:iam::866956573632:role/LabRole
+      Runtime: java17
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/LikeTweet/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/02PwQ6CMAyGn8X7qCAHvYrGg4nR6AOYOipOYBDWaQzh3d1cMJz69WvzN11AEqeQzPBtIpmXUaVu0F8YZSnOZBrbSRJudu1NCpmVJXGGxqlWFcj0xg/0bo/XrRKbux5xS23VfGrS7O2kc8kFeRdgPPHL/N8LQYEPxI8m9yrQICqsbzlC79SJuloZoxotdlZL9uD0yMPgu6Pl1vI0dBB7fOE8WUIMK/f70ygVdVazqgnOoX4BMGNzqBgBAAA=
+    Metadata:
+      aws:cdk:path: TwitterArchitectureAPIStack/CDKMetadata/Default
+Outputs:
+  TwitterRestAPIEndpointA0A81B85:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: TwitterRestAPIBCBB8D1C
+          - .execute-api.us-east-1.
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: TwitterRestAPIDeploymentStageprodAA3195DF
+          - /
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+Rules:
+  CheckBootstrapVersion:
+    Assertions:
+      - Assert:
+          Fn::Not:
+            - Fn::Contains:
+                - - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                - Ref: BootstrapVersion
+        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
+

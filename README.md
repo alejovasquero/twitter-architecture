@@ -1,86 +1,117 @@
 # Spark Web App
 
-This is an example web app using java spark and docker.
+A simple twitter architecture using AWS lambdas and API Gateway.
 
 # Architecture
 
 The architecture of this project is as follows.
 
-![Alt text](img/ARCHITECTURE.png)
+![Twitter Architecture](img/ARCHITECTURE.png)
 
-- A EC2 instance running in AWS. This instance has docker up and running to allow services.
-- A security group that handle the inbound rules to the EC2 instance. This security group allows traffic in the port 42000 TCP. In this example we are going to use HTTP to view the app content.
-- A web browser that requests the page content of the app via the internet.
+- A API gateway receiving requests from internet
+- 5 lambdas that receive the requests from every endpoint and processes
 
 # Prerequisites
 
 - Docker
 - AWS
+- Visual studio dev containers plugin
 
 
-## How to generate the docker images
+## How to build the architecture
 
-The project already has an [Dockerfile](./Dockerfile) with java 17 correto.
+Open the folder with dev containers and wait the container to start. The container has the following libraries:
+- Java 17
+- Maven
+- AWS CDK
+- AWS CLI
 
-Build the docker image
 
-```bash
-docker build --tag  docker-spark-web-app .
-```
-
-Tag the created image
-
-```bash
-docker tag docker-spark-web-app <username>/docker-spark-web-app
-```
-
-Push the image to docker hub
+Create a s3 bucket to upload the jar file. The container 
 
 ```bash
-docker push <username>/docker-spark-web-app
+aws s3api create-bucket --bucket codebuckettwitter --region us-east-1
 ```
 
-## Docker installation
 
-In a virtual machine, make sure docker is installed.
-
-Example with Amazon Linux in EC2.
+Build the lambdas JAR.
 
 ```bash
-sudo yum update -y
-sudo yum install docker
-sudo service docker start
-sudo usermod -a -G docker ec2-user
+mvn clean package
 ```
-
-## Running the app
-
-In the virtual machine, execute the following command to run the container.
-
-Example of the app running in the port 42000.
+Upload the JAR to s3.
 
 ```bash
-docker run -p 42000:15600 --name docker-spark-web-app-instance <username>/docker-spark-web-app
+aws s3 cp target/twitter-architecture.jar s3://codebuckettwitter
 ```
 
-## Openning the EC2 port
+Build cloud formation templates.
 
-In order to see the result, we must allow traffic in EC2 in the port 42000. In the AWS portal, go to your virtual machine, and go to security -> security group -> edit inbound rules.
+```bash
+cdk synth TwitterArchitectureAPIStack > template.yaml
+```
 
-Allow access to the port 42000 or the port your container is running in.
+Upload the template to cloud formation
 
-![Inbound rule](img/waf.png)
+```bash
+aws cloudformation create-stack --stack-name Twitter --template-body file://template.yaml
+```
 
-Save the configuration rule.
+Validate that the stack creation is completed.
+
+![Stack result](img/STACK.png)
+
+Once you are done, delete the resources
+
+```bash
+aws cloudformation delete-stack --stack-name Twitter
+```
+
+## Twitter entity
+
+This is a general data architecture of the solution.
+
+
+![Twitter Architecture](img/TWITTER-DATA.png)
+
+Use cases identified.
+
+![Twitter Architecture](img/TWITTER-USE%20CASES.png)
+
 
 ## Testing the app
 
-In AWS, find the VM ipv4 DNS.
+First lets get the API gateway identifier.
 
-![Alt text](img/vm_dns.png)
+```bash
+aws apigateway get-rest-apis --query 'items[].{API_ID:id, API_URL: @.id}[0].API_ID'
+```
 
-Open in a new window, in the port 42000, or the port you chose.
+The final URL has the following structure.
 
-Final result.
+https://{id}.execute-api.{region}.amazonaws.com/{stage}
 
-![Hello endpoint](img/hello_endpoint.png)
+My URL is the next
+
+![API Gateway URL](img/API_GATEWAY.png)
+
+## Get user tweets
+
+![Get tweets](img/GET_TWEETS.JPG)
+
+
+## Add follower
+
+![Add Follower](img/ADD_FOLLOWER.JPG)
+
+## Create tweet
+
+![Create tweet](img/CREATE_TWEET.JPG)
+
+## Create comment
+
+![Create comment](img/CREATE_COMMENT.JPG)
+
+## Like tweet
+
+![Like tweet](img/POST_LIKE.JPG)
