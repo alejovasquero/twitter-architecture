@@ -15,7 +15,13 @@ public class TwitterArchitectureApp {
                                                 .region("us-east-1")
                                                 .build())
                                 .build());
-                new TwitterArchitectureAPIStack(app, "TwitterArchitectureAPIStack", StackProps.builder().build());
+                new TwitterArchitectureAPIStack(app, "TwitterArchitectureAPIStack", StackProps
+                                .builder()
+                                .env(Environment.builder()
+                                                .account("866956573632")
+                                                .region("us-east-1")
+                                                .build())
+                                .build());
 
                 app.synth();
         }

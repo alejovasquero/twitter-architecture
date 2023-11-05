@@ -18,7 +18,7 @@ import software.constructs.Construct;
 public class TwitterArchitectureAPIStack extends Stack {
 
     private Construct scope;
-    private static final String JAR = "target/twitter-architecture-0.1.jar";
+    private static final String JAR = "twitter-architecture.jar";
     private IRole existingRole = Role.fromRoleArn(this, "MyExistingRole", "arn:aws:iam::866956573632:role/LabRole");
     private IBucket codeBucket = Bucket.fromBucketArn(this, "ExistingBucket", "arn:aws:s3:::codebuckettwitter");
 
@@ -63,14 +63,17 @@ public class TwitterArchitectureAPIStack extends Stack {
 
     private void createTweetsResource(IResource resource) {
         IResource tweetsResource = resource.addResource("tweets");
-        Method createTweet = tweetsResource.addMethod("POST");
+        Method createTweet = tweetsResource.addMethod("POST", new LambdaIntegration(
+                createNewLambda(this.scope, "CreateWeet", JAR, "com.myorg.handlers.CreateTweet::handler")));
 
         IResource tweetId = tweetsResource.addResource("{id}");
 
         IResource comment = tweetId.addResource("comments");
-        comment.addMethod("POST");
+        comment.addMethod("POST", new LambdaIntegration(
+                createNewLambda(this.scope, "AddComment", JAR, "com.myorg.handlers.AddTweetComment::handler")));
         IResource likes = tweetId.addResource("likes");
-        likes.addMethod("POST");
+        likes.addMethod("POST", new LambdaIntegration(
+                createNewLambda(this.scope, "LikeTweet", JAR, "com.myorg.handlers.AddLike::handler")));
     }
 
     public Function createNewLambda(final Construct scope, final String name, final String asset,
@@ -78,7 +81,7 @@ public class TwitterArchitectureAPIStack extends Stack {
         
         Function lambda = Function.Builder.create(this, name)
                 .runtime(Runtime.JAVA_17)
-                .code(Code.fromBucket(codeBucket, "twitter-architecture.jar"))
+                .code(Code.fromBucket(codeBucket, asset))
                 .handler(handler)
                 .role(existingRole)
                 .functionName(name)
